@@ -5,10 +5,14 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const userRoutes = require('../routes/Users');
 
-const { getMarketsInfo } = require('./apiHelpers');
+const {
+  getMarketsInfo
+} = require('./apiHelpers');
 
 const app = express();
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({
+  extended: true,
+}));
 app.use(bodyParser.json());
 const PORT = process.env.PORT || 3000;
 
