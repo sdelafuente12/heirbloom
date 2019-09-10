@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const userRoutes = require('../routes/Users');
 
 const {
-  getMarketsInfo
+  getMarketsInfo,
 } = require('./apiHelpers');
 
 const app = express();
