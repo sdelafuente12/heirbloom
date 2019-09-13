@@ -9,6 +9,8 @@ const models = require('../database-mysql');
 
 const {
   getMarketsInfo,
+  getUserCoordinates,
+  getRecipes,
 } = require('./apiHelpers');
 
 const app = express();
@@ -19,46 +21,88 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 const PORT = 3000;
 
-
 // serve the signup/login routes
 app.use('/api', userRoutes);
 
+
 app.post('/api/usdaResponse', (req, res) => {
-  // const { email } = req.body;
-  // req.body is a JSON object nested in a regular object
-  const keys = Object.keys(req.body);
-  // console.log('KEYSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS', keys);
-  const { email } = JSON.parse(keys[0]);
+  const {
+    email,
+  } = req.body;
   // query the database for the user with the input email
-  models.Users.findOne({ where: { email } })
+  return models.Users.findOne({
+    where: {
+      email,
+    },
+  })
     .then((foundUser) => {
       if (!foundUser) {
         return res.status(404).json('User not found');
       }
+      console.log(foundUser);
       // if the user exists:
-      // console.log(foundUser);
       // foundUser is an object with the user info from the db; pass the zipcode to getMarketsInfo
-      getMarketsInfo(foundUser.zipcode)
-        .then((marketInfo) => {
-          console.log(marketInfo);
-          res.send(marketInfo.map((marketObj) => marketObj.data));
-        })
-        .catch((err) => console.log(err));
+      return getMarketsInfo(foundUser.zipcode)
+        .then((marketInfo) => res.send(marketInfo))
+        .catch((err) => console.error(err));
     });
 });
 
-app.post('/api/usdaResponse', (req, res) => {
+
+app.post('/api/usercoords', (req, res) => {
   console.log(req.body);
-  getMarketsInfo(req.body.zipcode);
+  const { zipcode } = req.body;
+  return getUserCoordinates(zipcode)
+    .then((userLocation) => {
+      res.send(userLocation);
+    })
+    .catch((err) => console.error(err));
 });
 
 // app.get('/', () => {
 
 // })
 
-// app.post('/', () => {
+app.post('/api/localIngredients', (req, res) => {
+  console.log(req.body);
+  const { zipcode } = req.body;
+  return getUserCoordinates(zipcode)
+    .then((userLocation) => {
+      // userLocation in an object with the user's city, abbrv state and coordinates (an array)
+      const { city, state, geopoint } = userLocation;
+      return models.States.findAll({ where: { ABBREVIATION: state } })
+        .then((stateObj) => {
+          if (!stateObj) {
+            return res.status(404).json('State not found');
+          }
+          // region is the state's region [CONTINUE HERE!!!!!!!!!!!!!!!!!!!!!]
+          const { region } = stateObj[0];
+          function getMonthWord() {
+            const dt = new Date();
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            return months[dt.getMonth()];
+          }
+          const month = getMonthWord();
+          return models.Ingredients.findAll({
+            where: {
+              [month]: 1,
+              region,
+            },
+          })
+            .then((ingredients) => {
+              console.log(ingredients);
+              res.send(ingredients);
+            });
+        })
+        .catch((err) => console.error(err));
+    });
+});
 
-// })
+
+// these are not actual endpoints - use them with postman to see how the helper functions work
+app.post('/api/recipes', (req, res) => {
+  getRecipes(['broccoli', 'onion', 'garlic']);
+});
 
 // app.post('/', () => {
 
