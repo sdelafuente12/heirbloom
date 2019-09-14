@@ -36,7 +36,8 @@ class MarketMap extends Component {
         let coords = [];
         coords.push(newLink[0], long[1]);
         console.log(coords);
-        L.circle(coords).addTo(this.map);
+        L.circle(coords).addTo(this.map)
+        .bindPopup(obj.marketname.substring(4))
       })
     }
     createMarketMarkers(this.props.market);
