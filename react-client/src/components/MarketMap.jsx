@@ -23,7 +23,7 @@ class MarketMap extends Component {
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(this.map);
 
-    L.circle(this.props.location).addTo(this.map);
+    L.circle(this.props.location).addTo(this.map).bindPopup('This is you. Look around!');
 
     //const marketInfo  = this.props.marketInfo;
     //console.log(marke[0].GoogleLink.split("="));
@@ -35,8 +35,9 @@ class MarketMap extends Component {
         let long = newLink[2].split("20");
         let coords = [];
         coords.push(newLink[0], long[1]);
-        console.log(coords);
-        L.circle(coords).addTo(this.map);
+        console.log(this.props.market);
+        L.circle(coords).addTo(this.map)
+        .bindPopup(obj.marketname.substring(4))
       })
     }
     createMarketMarkers(this.props.market);
