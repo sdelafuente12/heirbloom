@@ -16,12 +16,30 @@ class MarketMap extends Component {
       zoom: 15,
       zoomControl: true
     });
-
+    
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,
       attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(this.map);
+   
+    L.circle(this.props.location).addTo(this.map);
+    
+    //const marketInfo  = this.props.marketInfo;
+    //console.log(marke[0].GoogleLink.split("="));
+
+    const createMarketMarkers = () => {
+      this.props.market.map((obj) => {
+       let link = obj.GoogleLink.split("=");
+       let newLink = link[1].split("%");
+       let long = newLink[2].split("20");
+       let coords = []; 
+       coords.push(newLink[0], long[1]);
+       console.log(coords);
+       L.circle(coords).addTo(this.map);
+      })
+    }
+    createMarketMarkers(this.props.market);
   }
 
   render() {
