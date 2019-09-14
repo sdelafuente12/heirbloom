@@ -41,6 +41,7 @@ class MarketMap extends Component {
       })
     }
     createMarketMarkers(this.props.market);
+    //thisisacomemnt
   }
 
   render() {
